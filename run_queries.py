@@ -1,6 +1,7 @@
 from table_creation import User
 from sqlalchemy.orm import Session
 from sqlalchemy import insert,select, or_
+from sqlalchemy.dialects.postgresql import insert as postgres_insert
 
 # Repository is a class that stores and manages database interactions.
 
@@ -66,6 +67,31 @@ class Repo:
         result = self.session.execute(stmt)
         return result.scalar()
 
+    def everything(self,telegram_id: int, full_name: str,language_code: str, username: str = None,referrer_id: int = None):
+        stmt = select(User).from_statement(
+            postgres_insert(User)
+            .values(
+                telegram_id=telegram_id,
+                full_name=full_name,
+                user_name=username,
+                language_code=language_code,
+                referrer_id=referrer_id
+            )
+            .returning(
+                User
+            )
+            .on_conflict_do_update(
+                index_elements = [User.telegram_id],
+                set_=dict(
+                    user_name=username,
+                    full_name=full_name
+                )
+            )
+        )
+        result = self.session.scalars(stmt).first()
+        self.session.commit()
+        return result
+
 
 
 if __name__=="__main__":
@@ -85,3 +111,5 @@ if __name__=="__main__":
         print(users)
         lang = repo.get_user_language(1)
         print(lang)
+        user = repo.everything(2,'Chetan M Gajjar','en','ChetanGajjar')
+        print(user)
