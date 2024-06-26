@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase, relationship
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.sql.sqltypes import BIGINT, VARCHAR, TIMESTAMP, Integer
+from sqlalchemy.sql.sqltypes import BIGINT, VARCHAR, TIMESTAMP, Integer, DECIMAL
 from datetime import datetime
 from sqlalchemy import func, ForeignKey
 from typing import Any, Optional, Annotated
@@ -46,15 +46,16 @@ class User(Base, TimeStampMixin, TableNameMixin):
 
     telegram_id: Mapped[int_pk]
     full_name: Mapped[str_255]
-    username: Mapped[Optional[str_255]] 
-    language_code: Mapped[str_255] 
+    user_name: Mapped[Optional[str_255]] 
+    language_code: Mapped[str] = mapped_column(VARCHAR(10)) 
     referrer_id: Mapped[Optional[user_fk]]
 
 
 class Product(Base,TimeStampMixin,TableNameMixin):
     product_id: Mapped[int_pk]
     title: Mapped[str_255]
-    description: Mapped[Optional[str]]
+    description: Mapped[Optional[str]] = mapped_column(VARCHAR(3000))
+    price: Mapped[float] = mapped_column(DECIMAL(precision=16,scale=4))
 
 class Order(Base,TimeStampMixin,TableNameMixin):
     order_id: Mapped[int_pk]
@@ -74,8 +75,8 @@ class OrderProduct(Base,TableNameMixin):
     product = relationship("Product", backref="orderproducts")
 
 
-# Drops all tables
-Base.metadata.drop_all(engine)
+# # Drops all tables
+# Base.metadata.drop_all(engine)
 
 # Creates all tables
-Base.metadata.create_all(engine)
+# Base.metadata.create_all(engine)

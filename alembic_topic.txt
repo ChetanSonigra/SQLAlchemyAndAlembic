@@ -1,0 +1,33 @@
+1. pip install alembic
+2. alembic init alembic_name
+3. In alembic_name --> env.py: 
+
+    # Connection String Format: driver+postgresql://user:pass@host:port/dbname
+    url = URL.create(os.getenv('DRIVER'),
+                    os.getenv('POSTGRES_USER'),
+                    os.getenv('POSTGRES_PASSWORD'),
+                    os.getenv('HOST'),
+                    os.getenv('PORT'),
+                    os.getenv('DB_NAME')).render_as_string(hide_password=False)
+
+    config.set_main_option(
+        "sqlalchemy.url",
+        url
+    )
+
+    from table_creation import Base
+
+    target_metadata = Base.metadata
+
+4. alembic revision --help
+# Before step 5, ensure all tables are deleted in database.
+5. alembic revision --autogenerate -m 'Initial Migration'
+6. alembic upgrade head 
+   alembic upgrade +1
+   alembic upgrade +2
+   alembic downgrade -1
+   alembic downgrade -2
+   alembic downgrade base
+   alembic current
+   alembic history
+
