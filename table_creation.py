@@ -29,7 +29,7 @@ class TableNameMixin:
 
 int_pk = Annotated[
     int,
-    mapped_column(Integer,primary_key=True, autoincrement=False)
+    mapped_column(Integer,primary_key=True)
 ]
 
 str_255 = Annotated[
@@ -44,7 +44,7 @@ user_fk = Annotated[
 
 class User(Base, TimeStampMixin, TableNameMixin):
 
-    telegram_id: Mapped[int_pk]
+    telegram_id: Mapped[int_pk] = mapped_column(Integer, autoincrement=False)
     full_name: Mapped[str_255]
     user_name: Mapped[Optional[str_255]] 
     language_code: Mapped[str] = mapped_column(VARCHAR(10)) 
